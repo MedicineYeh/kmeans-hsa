@@ -141,7 +141,6 @@ void initial_kernel()
     err |= clSetKernelArg(kernel, 6, sizeof(cl_mem), &cl_chpt);
     err |= clSetKernelArg(kernel, 7, sizeof(cl_mem), &cl_cent_c);
     err |= clSetKernelArg(kernel, 8, sizeof(cl_mem), &cl_min_dis);
-    err |= clSetKernelArg(kernel, 9, sizeof(float) * K * DIM, NULL);
 
     if (err != CL_SUCCESS) {
         printf("Error: Failed to set kernel arguments! %d\n", err);

@@ -7,21 +7,16 @@ __kernel void cal_dis(
         const unsigned int DCNT,
         __global int * chpt,
         __global int * cent_c_ker,
-        __global float * min_dis,
-        __local int * _local_cent_ker)
+        __global float * min_dis)
 {
     int core = get_global_id(0);
     int worksize = get_global_size(0);
     int i, j, k, min_k;
     float t ,min_sum=0.0;
 
-    for (i = 0; i < K * DIM; i++) {
-        _local_cent_ker[i] = cent_ker[i];
-    }
-
     min_k = 0;
     for (i = 0; i < DIM; i++) {
-        t = data_ker[core * DIM + i] - _local_cent_ker[i];
+        t = data_ker[core * DIM + i] - cent_ker[i];
         min_sum += t * t;
     }
 
@@ -29,7 +24,7 @@ __kernel void cal_dis(
         float sum = 0.0;
 
         for (k = 0; k < DIM; k++) {
-            t = data_ker[core * DIM + k] - _local_cent_ker[j * DIM + k];
+            t = data_ker[core * DIM + k] - cent_ker[j * DIM + k];
             sum += t * t;
         }
 

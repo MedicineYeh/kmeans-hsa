@@ -117,8 +117,8 @@ void initial_kernel()
     cl_cent_c = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(int)*DCNT, &cent_c_ker[0], NULL);
     cl_min_dis = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(float)*DCNT, &min_dis[0], NULL);  
 */
-    cl_data    = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(float)*DCNT*DIM  , NULL, NULL);
-    cl_cent    = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(float)*K*DIM  , NULL, NULL);
+    cl_data    = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(float)*DCNT*DIM, NULL, NULL);
+    cl_cent    = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(float)*K*DIM, NULL, NULL);
     cl_table   = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(int)*DCNT, NULL, NULL);
     cl_chpt    = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(int)*DCNT, NULL, NULL);
     cl_cent_c  = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(int)*DCNT, NULL, NULL);
@@ -141,6 +141,7 @@ void initial_kernel()
     err |= clSetKernelArg(kernel, 6, sizeof(cl_mem), &cl_chpt);
     err |= clSetKernelArg(kernel, 7, sizeof(cl_mem), &cl_cent_c);
     err |= clSetKernelArg(kernel, 8, sizeof(cl_mem), &cl_min_dis);
+    err |= clSetKernelArg(kernel, 9, sizeof(float) * K * DIM, NULL);
 
     if (err != CL_SUCCESS) {
         printf("Error: Failed to set kernel arguments! %d\n", err);
@@ -168,8 +169,8 @@ release:
 // 更新table, 傳回sse, 存入點之變動數
 float update_table_cl(int* ch_pt)
 {
-    int i, j, k, min_k;
-    float dis,  t_sse=0.0;
+    int i, j, k;
+    float t_sse=0.0;
     float data_ker[DCNT*DIM];
     float cent_ker[K*DIM];
     int cent_c_ker[DCNT];
@@ -227,6 +228,11 @@ float update_table_cl(int* ch_pt)
         err |= clEnqueueReadBuffer(queue, cl_cent_c, CL_TRUE, 0, sizeof(cl_int)*DCNT, &cent_c_ker[0], 0, 0, 0);
         err |= clEnqueueReadBuffer(queue, cl_min_dis, CL_TRUE, 0, sizeof(cl_float)*DCNT, &min_dis[0], 0, 0, 0);
     }
+    else {
+        printf("Can't enqueue kernel\n");
+        exit(1);
+    }
+
     for(i=0;i<DCNT;i++) {
         *ch_pt+=chpt[i];
         ++cent_c[cent_c_ker[i]];
@@ -244,6 +250,9 @@ float update_table_cl(int* ch_pt)
 void update_cent_cl()
 {
     int k, j;
+
+    clFinish(queue);
+
     for(k=0; k<K; ++k)
         for(j=0; j<DIM; ++j)
             cent[k][j]=dis_k[k][j]/cent_c[k];

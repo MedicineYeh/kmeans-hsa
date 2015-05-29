@@ -12,7 +12,7 @@
 // param define
 #define DCNT     100000 /* 資料個數   */
 #define DIM      10   /* 資料維度   */
-#define K        3   /* 叢聚個數   */
+#define K        10   /* 叢聚個數   */
 #define MAX_ITER 20  /* 最大迭代   */
 #define MIN_PT   0   /* 最小變動點 */
 #define LOW      20  /* 資料下限   */
@@ -122,6 +122,7 @@ void kmeans_init()
         {cent[k][j] = data[pick[k]][j];
             centc[k][j] = data[pick[k]][j];}
 }
+
 static inline void tic(struct timespec *t1)
 {
     clock_gettime(CLOCK_REALTIME, t1);
@@ -132,9 +133,7 @@ static inline void toc(char *str, struct timespec *t1, struct timespec *t2)
     long period = 0;
 
     clock_gettime(CLOCK_REALTIME, t2);
-    period = t2->tv_nsec - t1->tv_nsec;
-    if (period < 0) period += 1000000000;
-    period += (t2->tv_sec - t1->tv_sec) * 1000000000;;
+    period = (t2->tv_sec - t1->tv_sec) * 1e9 + t2->tv_nsec - t1->tv_nsec;
     printf("\033[1;32m"); //Color Code - Green 
     printf("%s: %0.3lf ms\n\n", str, (double)period / 1000000.0);
     printf("\033[0;00m"); //Terminate Color Code

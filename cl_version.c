@@ -104,6 +104,14 @@ void initial_kernel()
         fprintf(stderr, "Device(%d/%d): %s\n", i, num_total_devices, devname[i]);
     }
 
+    fprintf(stderr, "Found %d devices:\n", num_total_devices);
+    for (i = 0; i < num_total_devices; i++) {
+        clGetDeviceInfo(devices[i], CL_DEVICE_NAME, 256, devname[i], 0);
+        fprintf(stderr, "\t%d: %s", i, devname[i]);
+        clGetDeviceInfo(devices[i], CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(int), &cb, 0);
+        fprintf(stderr, "  - %d\n", (int)cb);
+    }
+
     queue = clCreateCommandQueue(context, devices[0], 0, 0);
     checkExit(queue, "Can't create command queue\n");
 

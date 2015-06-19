@@ -25,11 +25,12 @@ void kmeans_main()
 
     tic(&timer_1);
     ch_pt=0;
-    memset(cent_c, 0, sizeof(cent_c)); // ?叢?è?
-    memset(dis_k, 0, sizeof(dis_k));   // ?叢?è?
+    memset(cent_c, 0, sizeof(cent_c)); // 各叢聚資料數清0
+    memset(dis_k, 0, sizeof(dis_k));   // 各叢聚距離和清0
 
+    // step 3 - 更新重心
     cal_diskernel((float *)data,(float *)cent,table,N_K,N_DIM,N_DCNT,chpt,cent_c_ker,min_dis,lparm);
-
+    // step 4 - 更新對應表
     for(i=0;i<N_DCNT;i++) {
         ch_pt+=chpt[i];
         ++cent_c[cent_c_ker[i]];
@@ -38,20 +39,19 @@ void kmeans_main()
             dis_k[table[i]][j]+=data[i][j];
         }
     }
-    sse2=t_sse;
-
-
-    //    sse2 = update_table_cl(&ch_pt);     /* step 2 - 更新一次對應表      */
-    do{
+    sse2 = t_sse;
+    do {
         sse1 = sse2, ++iter;
         update_cent();             /* step 3 - 更新重心            */
 
         t_sse=0.0;
         ch_pt=0;
-        memset(cent_c, 0, sizeof(cent_c)); // ?<84>??<9a>è?
-        memset(dis_k, 0, sizeof(dis_k));   // ?<84>??<9a>è?
+        memset(cent_c, 0, sizeof(cent_c)); // 各叢聚資料數清0
+        memset(dis_k, 0, sizeof(dis_k));   // 各叢聚距離和清0
         //SNK_INIT_LPARM(lparm,N_DCNT);
+        // step 3 - 更新重心
         cal_diskernel((float *)data,(float *)cent,table,N_K,N_DIM,N_DCNT,chpt,cent_c_ker,min_dis,lparm);
+        // step 4 - 更新對應表
         for(i=0;i<N_DCNT;i++) {
             ch_pt+=chpt[i];
             ++cent_c[cent_c_ker[i]];
@@ -61,9 +61,6 @@ void kmeans_main()
             }
         }
         sse2=t_sse;
-
-
-        //     sse2=update_table_cl(&ch_pt); /* step 4 - 更新對應表          */
     }while(iter<MAX_ITER && sse1!=sse2 && ch_pt>MIN_PT); // 收斂條件
     toc("HSA Execution Time", &timer_1, &timer_2);
 

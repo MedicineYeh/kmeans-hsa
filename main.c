@@ -16,6 +16,7 @@
 // ------------------------------------
 // function declare
 void get_data();               // 取得資料
+void load_data(char *filename);
 void kmeans_init();            // 演算法初始化
 void update_cent();
 void print_cent();
@@ -43,15 +44,52 @@ struct timespec timer_1, timer_2;
 
 // ------------------------------------
 // main function
-int main()
+int main(int argc, char **argv)
 {
-    srand((unsigned)time(NULL));     
-    get_data();                      /* step 0 - 取得資料            */
-    kmeans_init();                   /* step 1 - 初始化,隨機取得重心 */
+    if (argc != 2) {
+        printf("usage: %s filename\n\n", argv[0]);
+        return 1;
+    }
 
+#ifdef __USE_RANDOM__
+    srand((unsigned)time(NULL)); 
+    get_data();                      /* step 0 - 取得資料            */
+#else
+    srand(100); 
+    load_data(argv[1]);
+#endif
+    kmeans_init();                   /* step 1 - 初始化,隨機取得重心 */
+    
     kmeans_main();
 
     return 0;
+}
+
+void load_data(char *filename)
+{
+    int i, j, tmp;
+    FILE *fp = fopen(filename, "rt");
+
+    if (fp == NULL) {printf("file %s not found\n", filename); exit(1);}
+    fscanf(fp, "%d,", &tmp);
+    if (tmp != N_DCNT) {printf("DCNT does not match (%d, %d)\n", tmp, N_DCNT); exit(1);}
+    fscanf(fp, "%d", &tmp);
+    if (tmp != N_DIM) {printf("DIM does not match (%d, %d)\n", tmp, N_DIM); exit(1);}
+    for(i = 0; i < N_DCNT ; i++) {
+        for (j = 0; j < N_DIM; j++) {
+            fscanf(fp, "%f,", &data[i][j]);
+        }
+    }
+
+    fclose(fp);
+/*    
+    for(i = 0; i < N_DCNT ; i++) {
+        for (j = 0; j < N_DIM; j++) {
+            printf("%f, ", data[i][j]);
+        }
+        printf("\n");
+    }
+*/
 }
 
 // ------------------------------------
@@ -61,8 +99,9 @@ void get_data()
     int i, j;
     for(i=0; i<N_DCNT; ++i)
         for(j=0; j<N_DIM; ++j)
-            data[i][j] = i*N_DCNT+j;//LOW + (float)rand()*(UP-LOW) / RAND_MAX;
+            data[i][j] = LOW + (float)rand()*(UP-LOW) / RAND_MAX;
 }
+
 // ------------------------------------
 // 演算化初始化
 void kmeans_init()

@@ -91,7 +91,7 @@ void kmeans_main()
     print_cent(); // 顯示最後重心位置
     printf("sse   = %.2lf\n", sse2);
     printf("ch_pt = %d\n", ch_pt);
-    printf("iter = %d\n", iter);
+    printf("iter  = %d\n", iter);
 
 }
 

@@ -1,6 +1,13 @@
 #define checkErr(fun, statement) err = fun;\
                                  if (err != CL_SUCCESS) {statement}
 #define checkExit(value, message) if (value == 0) {printf(message); goto release;}
+// ------------------------------------
+// variable
+float data[DCNT][DIM]; /* 原始資料   */
+float cent[K][DIM]; /* 重心       */
+float dis_k[K][DIM];   /* 叢聚距離   */
+int table[DCNT];        /* 資料所屬叢聚*/
+int cent_c[K];          /* 該叢聚資料數*/
 
 cl_int err = 0;
 cl_uint num = 0;
@@ -244,29 +251,24 @@ float update_table_cl(int* ch_pt)
     return t_sse;
 }
 
-// ------------------------------------
-// 更新重心位置
-void update_cent_cl()
+void kmeans_main()
 {
-    int k, j;
+    //OpenCL
+    tic(&timer_1);
+    initial_kernel();
+    toc("OpenCL initial Time: ", &timer_1, &timer_2);
 
-    clFinish(queue);
-
-    for(k=0; k<K; ++k)
-        for(j=0; j<DIM; ++j)
-            cent[k][j]=dis_k[k][j]/cent_c[k];
+    tic(&timer_1);
+    sse2 = update_table(&ch_pt);     // step 2 - 更新一次對應表
+    do {
+        sse1 = sse2, ++iter;
+        update_cent();               // step 3 - 更新重心
+        sse2=update_table(&ch_pt);   // step 4 - 更新對應表
+    }while(iter<MAX_ITER && sse1!=sse2 && ch_pt>MIN_PT); // 收斂條件
+    toc("OpenCL Execution Time: ", &timer_1, &timer_2);
+    print_cent(); // 顯示最後重心位置
+    printf("sse   = %.2lf\n", sse2);
+    printf("ch_pt = %d\n", ch_pt);
+    printf("iter  = %d\n", iter);
 }
-
-// ------------------------------------
-// 顯示重心位置
-void print_cent_cl()
-{
-    int j, k;
-    for(k=0; k<K; ++k) {
-        for(j=0; j<DIM; ++j)
-            printf("%6.2lf ", cent[k][j]);
-        putchar('\n');
-    }
-}
-
 

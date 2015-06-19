@@ -241,6 +241,7 @@ float update_table_cl(int* ch_pt)
         err |= clEnqueueReadBuffer(queue, cl_table, CL_TRUE, 0, sizeof(cl_int)*N_DCNT, &table[0], 0, 0, 0);
         err |= clEnqueueReadBuffer(queue, cl_cent_c, CL_TRUE, 0, sizeof(cl_int)*N_DCNT, &cent_c_ker[0], 0, 0, 0);
         err |= clEnqueueReadBuffer(queue, cl_min_dis, CL_TRUE, 0, sizeof(cl_float)*N_DCNT, &min_dis[0], 0, 0, 0);
+    	clFinish(queue);
     }
     else {
         printf("Can't enqueue kernel\n");

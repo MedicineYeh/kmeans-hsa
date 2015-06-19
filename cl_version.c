@@ -53,12 +53,12 @@ cl_program load_program(cl_context context, cl_device_id device, const char* fil
 
     status = clBuildProgram(program, 0, 0, 0, 0, 0);
     if (status != CL_SUCCESS) {
-        printf("Error:  Building Program from file %s\n", filename);
+        fprintf(stderr, "Error:  Building Program from file %s\n", filename);
         clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG, 0, NULL, &ret_val_size);
         build_log = (char *)malloc(ret_val_size + 1);
         clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG, ret_val_size, build_log, NULL);
         build_log[ret_val_size] = '\0';
-        printf("Building Log:\n%s", build_log);
+        fprintf(stderr, "Building Log:\n%s", build_log);
         return 0;
     }
 
@@ -101,7 +101,7 @@ void initial_kernel()
     for (i = 0; i < num_total_devices; i++) {
         clGetDeviceInfo(devices[i], CL_DEVICE_NAME, 0, NULL, &cb);
         clGetDeviceInfo(devices[i], CL_DEVICE_NAME, cb, devname, 0);
-        printf("Device(%d/%d): %s\n", i, num_total_devices, devname[i]);
+        fprintf(stderr, "Device(%d/%d): %s\n", i, num_total_devices, devname[i]);
     }
 
     queue = clCreateCommandQueue(context, devices[0], 0, 0);
@@ -257,6 +257,7 @@ void kmeans_main()
     int    iter = 0;       /* 迭代計數器   */
     float  sse1 = 0.0;     /* 上一迭代之sse */
     float  sse2 = 0.0;     /* 此次迭代之sse */
+    struct timespec timer_1, timer_2;
 
     //OpenCL
     tic(&timer_1);

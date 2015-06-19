@@ -52,6 +52,7 @@ void kmeans_main()
     int    iter = 0;       /* 迭代計數器   */
     float  sse1 = 0.0;     /* 上一迭代之sse */
     float  sse2 = 0.0;     /* 此次迭代之sse */
+    struct timespec timer_1, timer_2;
 
     //C
     tic(&timer_1);
@@ -59,7 +60,7 @@ void kmeans_main()
     do {
         sse1 = sse2, ++iter;
         update_cent();                  // step 3 - 更新重心
-        sse2=update_table(&ch_pt);  // step 4 - 更新對應表
+        sse2=update_table(&ch_pt);      // step 4 - 更新對應表
     }while(iter < MAX_ITER && sse1 != sse2 && ch_pt > MIN_PT); // 收斂條件
     toc("CPU Execution Time: ", &timer_1, &timer_2);
     print_cent(); // 顯示最後重心位置

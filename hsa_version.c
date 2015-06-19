@@ -17,6 +17,7 @@ void kmeans_main()
     float  sse2 = 0.0;     /* 此次迭代之sse */
     float  t_sse = 0.0;    /* 此次迭代之sse */
     int i, j;
+    struct timespec timer_1, timer_2;
 
     tic(&timer_1);
     SNK_INIT_LPARM(lparm, N_DCNT);

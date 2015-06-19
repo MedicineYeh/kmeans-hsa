@@ -23,7 +23,6 @@ void print_cent();
 static inline void tic(struct timespec *t1);
 static inline void toc(char *str, struct timespec *t1, struct timespec *t2);
 
-struct timespec timer_1, timer_2;
 
 // ------------------------------------
 // different version of kmeans

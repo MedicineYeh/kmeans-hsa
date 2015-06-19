@@ -25,20 +25,9 @@ void kmeans_main()
 
     tic(&timer_1);
     ch_pt=0;
-//    memset(cent_c, 0, sizeof(cent_c)); // ?叢?è?
-//    memset(dis_k, 0, sizeof(dis_k));   // ?叢?è?
-/*
-    for (i=0; i<N_DCNT;++i) {
-        for(k=0; k<N_DIM;++k) {
-            data[i*N_DIM+k]=data[i][k];
-        }
-    }
-    for (i=0; i<N_K;++i) {
-        for(k=0; k<N_DIM;++k) {
-            cent[i*N_DIM+k]=cent[i][k];
-        }
-    }
-*/
+    memset(cent_c, 0, sizeof(cent_c)); // ?叢?è?
+    memset(dis_k, 0, sizeof(dis_k));   // ?叢?è?
+
     cal_diskernel((float *)data,(float *)cent,table,N_K,N_DIM,N_DCNT,chpt,cent_c_ker,min_dis,lparm);
 
     for(i=0;i<N_DCNT;i++) {
@@ -61,17 +50,6 @@ void kmeans_main()
         ch_pt=0;
         memset(cent_c, 0, sizeof(cent_c)); // ?<84>??<9a>è?
         memset(dis_k, 0, sizeof(dis_k));   // ?<84>??<9a>è?
-        /*
-        for (i=0; i<N_DCNT;++i) {
-            for(k=0; k<N_DIM;++k) {
-                data[i*N_DIM+k]=data[i][k];
-            }
-        }
-        for (i=0; i<N_K;++i) {
-            for(k=0; k<N_DIM;++k) {
-                cent[i*N_DIM+k]=cent[i][k];
-            }
-        }*/
         //SNK_INIT_LPARM(lparm,N_DCNT);
         cal_diskernel((float *)data,(float *)cent,table,N_K,N_DIM,N_DCNT,chpt,cent_c_ker,min_dis,lparm);
         for(i=0;i<N_DCNT;i++) {

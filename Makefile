@@ -12,6 +12,9 @@ all	:	data_generator hsa c_test cl_test
 execute	:	hsa c_test
 	@./run_all.sh test_set
 
+execute_cl	:	cl_test c_test
+	@./run_all.sh test_set
+
 cl_test	:	main.c cl_version.c
 	@echo "  CC     \033[1;36m$@\033[0;00m"
 	@$(CC) main.c -o $@ -D"__USE_CL__" $(CFLAGS) $(LFLAGS)

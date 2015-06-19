@@ -23,7 +23,7 @@ fi
 if [ -f ./snack ]; then
     echo ./snack ${test_set};
     ./snack ${test_set} | tee result.log;
+    ./valid.sh
 fi
 
-./valid.sh
 

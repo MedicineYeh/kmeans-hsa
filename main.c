@@ -29,6 +29,12 @@ static inline void toc(char *str, struct timespec *t1, struct timespec *t2);
 #ifdef __USE_SNACK__
 //此行是snack.sh hw.cl 所產生的  必須加入！！！！！！ hw.h
 #include "shader_hsa.h"
+#include "snack_version.c"
+#endif
+
+#ifdef __USE_HSA__
+#include "hsa.h"
+#include "hsa_ext_finalize.h"
 #include "hsa_version.c"
 #endif
 

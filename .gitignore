@@ -1,9 +1,11 @@
 cl_test
 c_test
 hsa
+snack
 data_generator
 *.o
 *.swp
 *.log
 shader_hsa.h
 test_set
+*.brig

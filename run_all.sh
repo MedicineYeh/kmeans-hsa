@@ -20,4 +20,10 @@ if [ -f ./hsa ]; then
 fi
 
 ./valid.sh
+if [ -f ./snack ]; then
+    echo ./snack ${test_set};
+    ./snack ${test_set} | tee result.log;
+fi
+
+./valid.sh
 

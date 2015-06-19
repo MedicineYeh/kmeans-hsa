@@ -4,16 +4,23 @@ LFLAGS=-lOpenCL
 HSA_RUNTIME_PATH=/opt/hsa
 HSA_LLVM_PATH=/opt/amd/cloc/bin
 LD_LIBRARY_PATH=$(HSA_RUNTIME_PATH)/lib
+INCS=-I $(HSA_RUNTIME_PATH)/include
 
-.PHONY	:	all execute clean
+.PHONY	:	all execute clean execute_cl execute_hsa execute_snack
 
-all	:	data_generator hsa c_test cl_test
+all	:	data_generator hsa snack c_test cl_test
 
 execute	:	hsa c_test
 	@./run_all.sh test_set
 
 execute_cl	:	cl_test c_test
 	@./run_all.sh test_set
+
+execute_hsa	:	hsa
+	./hsa ./test_set
+
+execute_snack	:	snack
+	./snack ./test_set
 
 cl_test	:	main.c cl_version.c
 	@echo "  CC     \033[1;36m$@\033[0;00m"
@@ -23,7 +30,15 @@ c_test	:	main.c c_version.c
 	@echo "  CC     \033[1;36m$@\033[0;00m"
 	@$(CC) main.c -o $@ -D"__USE_C__" $(CFLAGS)
 
-hsa	:	main.c hsa_version.c shader_hsa.o shader_hsa.h
+hsa	:	main.c hsa_version.c shader_hsa.brig
+	@echo "  CC     \033[1;36m$@\033[0;00m"
+	@$(CC) shader_hsa.o main.c -o $@ -D"__USE_HSA__" $(INCS) $(CFLAGS) -L$(HSA_RUNTIME_PATH)/lib -lhsa-runtime64
+
+%.brig	:	%.cl
+	@echo "  CLOC   \033[1;36m$@\033[0;00m"
+	cloc.sh $<
+
+snack	:	main.c snack_version.c shader_hsa.o shader_hsa.h
 	@echo "  CC     \033[1;36m$@\033[0;00m"
 	@$(CC) shader_hsa.o main.c -o $@ -D"__USE_SNACK__" $(CFLAGS) -L$(HSA_RUNTIME_PATH)/lib -lhsa-runtime64
 

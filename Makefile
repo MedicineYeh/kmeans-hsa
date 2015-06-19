@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-g -Wall
+CFLAGS=-g -Wall -Wno-deprecated-declarations
 LFLAGS=-lOpenCL
 HSA_RUNTIME_PATH=/opt/hsa
 HSA_LLVM_PATH=/opt/amd/cloc/bin

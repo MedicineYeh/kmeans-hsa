@@ -2,4 +2,5 @@ cl_test
 c_test
 hsa
 *.o
+*.swp
 shader_hsa.h

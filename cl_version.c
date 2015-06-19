@@ -3,11 +3,11 @@
 #define checkExit(value, message) if (value == 0) {printf(message); goto release;}
 // ------------------------------------
 // variable
-float data[DCNT][DIM]; /* 原始資料   */
-float cent[K][DIM]; /* 重心       */
-float dis_k[K][DIM];   /* 叢聚距離   */
-int table[DCNT];        /* 資料所屬叢聚*/
-int cent_c[K];          /* 該叢聚資料數*/
+float data[N_DCNT][N_DIM];  /* 原始資料   */
+float cent[N_K][N_DIM];     /* 重心       */
+float dis_k[N_K][N_DIM];    /* 叢聚距離   */
+int table[N_DCNT];        /* 資料所屬叢聚*/
+int cent_c[N_K];          /* 該叢聚資料數*/
 
 cl_int err = 0;
 cl_uint num = 0;
@@ -114,22 +114,22 @@ void initial_kernel()
     if (err == CL_INVALID_KERNEL_NAME) printf("CL_INVALID_KERNEL_NAME\n");
     checkExit(kernel, "Can't load kernel\n");
 /*
-    cl_data  = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR , sizeof(float)*DCNT*DIM  , &data_ker[0], NULL);
-    cl_cent  = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR , sizeof(float)*K*DIM  , &cent_ker[0], NULL);
-    cl_table = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR , sizeof(int)*DCNT, &table[0], NULL);
+    cl_data  = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR , sizeof(float)*N_DCNT*N_DIM  , &data_ker[0], NULL);
+    cl_cent  = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR , sizeof(float)*N_K*N_DIM  , &cent_ker[0], NULL);
+    cl_table = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR , sizeof(int)*N_DCNT, &table[0], NULL);
     cl_k = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(cl_int), &k_ker, NULL);
     cl_dim = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(cl_int), &dim_ker, NULL);
     cl_dcnt = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(cl_int), &dcnt_ker, NULL);
-    cl_chpt = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(int)*DCNT, &chpt[0], NULL);
-    cl_cent_c = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(int)*DCNT, &cent_c_ker[0], NULL);
-    cl_min_dis = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(float)*DCNT, &min_dis[0], NULL);  
+    cl_chpt = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(int)*N_DCNT, &chpt[0], NULL);
+    cl_cent_c = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(int)*N_DCNT, &cent_c_ker[0], NULL);
+    cl_min_dis = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(float)*N_DCNT, &min_dis[0], NULL);  
 */
-    cl_data    = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(float)*DCNT*DIM, NULL, NULL);
-    cl_cent    = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(float)*K*DIM, NULL, NULL);
-    cl_table   = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(int)*DCNT, NULL, NULL);
-    cl_chpt    = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(int)*DCNT, NULL, NULL);
-    cl_cent_c  = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(int)*DCNT, NULL, NULL);
-    cl_min_dis = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float)*DCNT, NULL, NULL);  
+    cl_data    = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(float)*N_DCNT*N_DIM, NULL, NULL);
+    cl_cent    = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(float)*N_K*N_DIM, NULL, NULL);
+    cl_table   = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(int)*N_DCNT, NULL, NULL);
+    cl_chpt    = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(int)*N_DCNT, NULL, NULL);
+    cl_cent_c  = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(int)*N_DCNT, NULL, NULL);
+    cl_min_dis = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float)*N_DCNT, NULL, NULL);  
 
     if (    !cl_data || 
             !cl_cent || 
@@ -177,13 +177,13 @@ float update_table_cl(int* ch_pt)
 {
     int i, j, k;
     float t_sse=0.0;
-    float data_ker[DCNT*DIM];
-    float cent_ker[K*DIM];
-    int cent_c_ker[DCNT];
+    float data_ker[N_DCNT*N_DIM];
+    float cent_ker[N_K*N_DIM];
+    int cent_c_ker[N_DCNT];
     //float min_dis;
-    int chpt[DCNT];
-    float min_dis[DCNT];
-    unsigned int k_ker=K,dim_ker=DIM,dcnt_ker=DCNT;
+    int chpt[N_DCNT];
+    float min_dis[N_DCNT];
+    unsigned int k_ker=N_K,dim_ker=N_DIM,dcnt_ker=N_DCNT;
 
     *ch_pt=0;                          // 變動點數設0
     memset(cent_c, 0, sizeof(cent_c)); // 各叢聚資料數清0
@@ -191,59 +191,59 @@ float update_table_cl(int* ch_pt)
     /*OpenCL*/
     size_t work_size;
 
-    for (i=0; i<DCNT;++i) {
-        for(k=0; k<DIM;++k) {
-            data_ker[i*DIM+k]=data[i][k];
+    for (i=0; i<N_DCNT;++i) {
+        for(k=0; k<N_DIM;++k) {
+            data_ker[i*N_DIM+k]=data[i][k];
         }
     }
-    for (i=0; i<K;++i) {
-        for(k=0; k<DIM;++k) {
-            cent_ker[i*DIM+k]=cent[i][k];
+    for (i=0; i<N_K;++i) {
+        for(k=0; k<N_DIM;++k) {
+            cent_ker[i*N_DIM+k]=cent[i][k];
         }
     }
 
     err = 0;
     err |= clEnqueueWriteBuffer(queue, cl_data, CL_TRUE, 0, 
-                                sizeof(float) * DCNT * DIM, data_ker, 0, 0, 0);
+                                sizeof(float) * N_DCNT * N_DIM, data_ker, 0, 0, 0);
     err |= clEnqueueWriteBuffer(queue, cl_cent, CL_TRUE, 0, 
-                                sizeof(float) * K * DIM, cent_ker, 0, 0, 0);
+                                sizeof(float) * N_K * N_DIM, cent_ker, 0, 0, 0);
     err |= clEnqueueWriteBuffer(queue, cl_table, CL_TRUE, 0, 
-                                sizeof(int) * DCNT, table, 0, 0, 0);
+                                sizeof(int) * N_DCNT, table, 0, 0, 0);
 
     err |= clSetKernelArg(kernel, 3, sizeof(unsigned int), &k_ker);
     err |= clSetKernelArg(kernel, 4, sizeof(unsigned int), &dim_ker);
     err |= clSetKernelArg(kernel, 5, sizeof(unsigned int), &dcnt_ker);
 
     err |= clEnqueueWriteBuffer(queue, cl_chpt, CL_TRUE, 0, 
-                                sizeof(int) * DCNT, chpt, 0, 0, 0);
+                                sizeof(int) * N_DCNT, chpt, 0, 0, 0);
     err |= clEnqueueWriteBuffer(queue, cl_cent_c, CL_TRUE, 0, 
-                                sizeof(int) * DCNT, cent_c_ker, 0, 0, 0);
+                                sizeof(int) * N_DCNT, cent_c_ker, 0, 0, 0);
     err |= clEnqueueWriteBuffer(queue, cl_min_dis, CL_TRUE, 0, 
-                                sizeof(float) * DCNT, min_dis, 0, 0, 0);
+                                sizeof(float) * N_DCNT, min_dis, 0, 0, 0);
     if (err) {
         printf("ERROR! WRITE BUFFER\n");
         exit(1);
     }
 
-    work_size = DCNT;
+    work_size = N_DCNT;
     err = clEnqueueNDRangeKernel(queue, kernel, 1, 0, &work_size, 0, 0, 0, 0);
 
     if (err == CL_SUCCESS) {
-        err |= clEnqueueReadBuffer(queue, cl_chpt, CL_TRUE, 0, sizeof(cl_int)*DCNT, &chpt[0], 0, 0, 0);
-        err |= clEnqueueReadBuffer(queue, cl_table, CL_TRUE, 0, sizeof(cl_int)*DCNT, &table[0], 0, 0, 0);
-        err |= clEnqueueReadBuffer(queue, cl_cent_c, CL_TRUE, 0, sizeof(cl_int)*DCNT, &cent_c_ker[0], 0, 0, 0);
-        err |= clEnqueueReadBuffer(queue, cl_min_dis, CL_TRUE, 0, sizeof(cl_float)*DCNT, &min_dis[0], 0, 0, 0);
+        err |= clEnqueueReadBuffer(queue, cl_chpt, CL_TRUE, 0, sizeof(cl_int)*N_DCNT, &chpt[0], 0, 0, 0);
+        err |= clEnqueueReadBuffer(queue, cl_table, CL_TRUE, 0, sizeof(cl_int)*N_DCNT, &table[0], 0, 0, 0);
+        err |= clEnqueueReadBuffer(queue, cl_cent_c, CL_TRUE, 0, sizeof(cl_int)*N_DCNT, &cent_c_ker[0], 0, 0, 0);
+        err |= clEnqueueReadBuffer(queue, cl_min_dis, CL_TRUE, 0, sizeof(cl_float)*N_DCNT, &min_dis[0], 0, 0, 0);
     }
     else {
         printf("Can't enqueue kernel\n");
         exit(1);
     }
 
-    for(i=0;i<DCNT;i++) {
+    for(i=0;i<N_DCNT;i++) {
         *ch_pt+=chpt[i];
         ++cent_c[cent_c_ker[i]];
         t_sse+=min_dis[i];
-        for(j=0;j<DIM;j++) {
+        for(j=0;j<N_DIM;j++) {
             dis_k[table[i]][j]+=data[i][j];
         }
     }
@@ -253,17 +253,22 @@ float update_table_cl(int* ch_pt)
 
 void kmeans_main()
 {
+    int    ch_pt = 0;      /* 紀錄變動之點 */
+    int    iter = 0;       /* 迭代計數器   */
+    float  sse1 = 0.0;     /* 上一迭代之sse */
+    float  sse2 = 0.0;     /* 此次迭代之sse */
+
     //OpenCL
     tic(&timer_1);
     initial_kernel();
     toc("OpenCL initial Time: ", &timer_1, &timer_2);
 
     tic(&timer_1);
-    sse2 = update_table(&ch_pt);     // step 2 - 更新一次對應表
+    sse2 = update_table_cl(&ch_pt);     // step 2 - 更新一次對應表
     do {
         sse1 = sse2, ++iter;
         update_cent();               // step 3 - 更新重心
-        sse2=update_table(&ch_pt);   // step 4 - 更新對應表
+        sse2=update_table_cl(&ch_pt);   // step 4 - 更新對應表
     }while(iter<MAX_ITER && sse1!=sse2 && ch_pt>MIN_PT); // 收斂條件
     toc("OpenCL Execution Time: ", &timer_1, &timer_2);
     print_cent(); // 顯示最後重心位置

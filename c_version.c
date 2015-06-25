@@ -23,7 +23,7 @@ float update_table(int* ch_pt)
     float dis, min_dis, t_sse=0.0;
 
     *ch_pt=0;                          // 變動點數設0
-    memset(cent_c, 0, sizeof(cent));   // 各叢聚資料數清0
+    memset(cent_c, 0, sizeof(cent_c));   // 各叢聚資料數清0
     memset(dis_k, 0, sizeof(dis_k));   // 各叢聚距離和清0
 
     for(i=0; i<N_DCNT; ++i){
